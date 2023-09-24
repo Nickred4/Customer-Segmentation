@@ -1,0 +1,28 @@
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# Load your transaction data into a DataFrame 
+data = pd.read_csv('apple.csv')
+
+# Data preprocessing (if needed), including one-hot encoding for categorical variables
+# Example: If your data is not one-hot encoded, you can use pd.get_dummies or other encoding techniques.
+
+# Perform one-hot encoding on the data (if necessary)
+# Example:
+# data_encoded = pd.get_dummies(data, columns=['Product'])
+
+# Convert the data to a format suitable for Apriori
+basket_sets = data.groupby(['Transaction_ID'])['Item_1', 'Item_2', 'Item_3', ...].sum().applymap(lambda x: 1 if x > 0 else 0)
+
+# Perform Apriori to find frequent itemsets
+frequent_itemsets = apriori(basket_sets, min_support=0.05, use_colnames=True)
+
+# Generate association rules from frequent itemsets
+rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1.0)
+
+# Display the association rules sorted by a specific metric (e.g., lift)
+sorted_rules = rules.sort_values(by=['lift'], ascending=False)
+print(sorted_rules)
+
+# Optionally, you can save the association rules to a CSV file
+sorted_rules.to_csv('association_rules.csv', index=False)
