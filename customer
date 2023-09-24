@@ -1,0 +1,37 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Load customer data
+data = pd.read_csv('customer_data.csv')
+
+# Select relevant features for segmentation
+X = data[['Annual Income', 'Spending Score']]
+
+# Determine the number of clusters (e.g., using the elbow method)
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_)
+
+# Plot the elbow method to find the optimal number of clusters
+plt.plot(range(1, 11), wcss)
+plt.title('Elbow Method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS')
+plt.show()
+
+# Based on the elbow method, choose the optimal number of clusters (e.g., 5)
+kmeans = KMeans(n_clusters=5, init='k-means++', max_iter=300, n_init=10, random_state=0)
+cluster_labels = kmeans.fit_predict(X)
+
+# Add cluster labels to the original dataset
+data['Cluster'] = cluster_labels
+
+# Visualize the customer segments
+plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=cluster_labels, cmap='rainbow')
+plt.xlabel('Annual Income')
+plt.ylabel('Spending Score')
+plt.title('Customer Segmentation')
+plt.show()
