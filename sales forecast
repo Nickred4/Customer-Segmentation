@@ -1,0 +1,52 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+
+# Load your historical sales data (replace 'sales_data.csv' with your data file)
+data = pd.read_csv('sales_data.csv')
+
+# Assuming your dataset has a 'Date' column and a 'Sales' column
+data['Date'] = pd.to_datetime(data['Date'])
+data.set_index('Date', inplace=True)
+
+# Visualize the historical sales data
+plt.figure(figsize=(12, 6))
+plt.plot(data['Sales'])
+plt.title('Historical Sales Data')
+plt.xlabel('Date')
+plt.ylabel('Sales')
+plt.show()
+
+# Decompose the time series data to identify seasonality and trend
+decomposition = seasonal_decompose(data['Sales'], model='additive', period=12)
+trend = decomposition.trend
+seasonal = decomposition.seasonal
+residual = decomposition.resid
+
+# Fit an Exponential Smoothing model to the data (you can try different variations)
+model = ExponentialSmoothing(data['Sales'], seasonal='add', seasonal_periods=12)
+results = model.fit()
+
+# Forecast future sales (adjust the 'steps' parameter as needed)
+forecast_steps = 12  # Number of periods to forecast into the future
+forecast = results.forecast(steps=forecast_steps)
+
+# Evaluate the model using RMSE (Root Mean Squared Error)
+historical_sales = data['Sales']
+forecasted_sales = forecast[-forecast_steps:]
+rmse = sqrt(mean_squared_error(historical_sales, forecasted_sales))
+print(f'Root Mean Squared Error (RMSE): {rmse}')
+
+# Visualize the historical and forecasted sales data
+plt.figure(figsize=(12, 6))
+plt.plot(historical_sales, label='Historical Sales')
+plt.plot(forecasted_sales, label='Forecasted Sales', linestyle='--')
+plt.title('Historical vs. Forecasted Sales')
+plt.xlabel('Date')
+plt.ylabel('Sales')
+plt.legend()
+plt.show()
