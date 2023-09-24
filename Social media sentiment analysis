@@ -1,0 +1,51 @@
+import pandas as pd
+from textblob import TextBlob
+import matplotlib.pyplot as plt
+
+# Sample social media data
+data = pd.DataFrame({
+    'Date': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04'],
+    'Text': [
+        "I love the new product! It's amazing!",
+        "The customer service was terrible. I'm disappointed.",
+        "This brand always delivers quality.",
+        "The app crashes frequently. It's frustrating."
+    ]
+})
+
+# Function to perform sentiment analysis using TextBlob
+def analyze_sentiment(text):
+    analysis = TextBlob(text)
+    # Sentiment polarity ranges from -1 (negative) to 1 (positive)
+    return analysis.sentiment.polarity
+
+# Apply sentiment analysis to each social media post
+data['Sentiment'] = data['Text'].apply(analyze_sentiment)
+
+# Visualize sentiment over time
+plt.figure(figsize=(8, 6))
+plt.plot(data['Date'], data['Sentiment'], marker='o', linestyle='-')
+plt.xlabel('Date')
+plt.ylabel('Sentiment Polarity')
+plt.title('Social Media Sentiment Over Time')
+plt.xticks(rotation=45)
+plt.grid(True)
+
+# Print the sentiment of each post
+for index, row in data.iterrows():
+    sentiment = 'Positive' if row['Sentiment'] > 0 else ('Negative' if row['Sentiment'] < 0 else 'Neutral')
+    print(f"Date: {row['Date']} - Sentiment: {sentiment} ({row['Sentiment']:.2f}) - Text: {row['Text']}")
+
+# Calculate overall sentiment
+average_sentiment = data['Sentiment'].mean()
+overall_sentiment = 'Positive' if average_sentiment > 0 else ('Negative' if average_sentiment < 0 else 'Neutral')
+print(f"Overall Sentiment: {overall_sentiment} ({average_sentiment:.2f})")
+
+# Display a histogram of sentiment polarity
+plt.figure(figsize=(6, 4))
+plt.hist(data['Sentiment'], bins=3, color='skyblue', edgecolor='black')
+plt.xlabel('Sentiment Polarity')
+plt.ylabel('Frequency')
+plt.title('Sentiment Distribution')
+plt.grid(True)
+plt.show()
