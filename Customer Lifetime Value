@@ -1,0 +1,27 @@
+import pandas as pd
+
+# Load your customer transaction data (replace 'customer_transactions.csv' with your dataset)
+customer_data = pd.read_csv('customer_transactions.csv')
+
+# Explore and understand the dataset
+print(customer_data.head())
+print(customer_data.info())
+
+# Calculate CLV using historical transaction data
+# CLV = Average Purchase Value * Average Purchase Frequency * Average Customer Lifespan
+
+# 1. Calculate Average Purchase Value (APV)
+average_purchase_value = customer_data['TotalPurchaseAmount'].mean()
+
+# 2. Calculate Average Purchase Frequency (APF)
+# Assuming that the dataset has a 'PurchaseDate' column
+customer_data['PurchaseDate'] = pd.to_datetime(customer_data['PurchaseDate'])
+average_purchase_frequency = 1 / (customer_data['PurchaseDate'].max() - customer_data['PurchaseDate'].min()).days
+
+# 3. Calculate Average Customer Lifespan (ACL)
+average_customer_lifespan = (customer_data['PurchaseDate'].max() - customer_data['PurchaseDate'].min()).days
+
+# Calculate CLV
+clv = average_purchase_value * average_purchase_frequency * average_customer_lifespan
+
+print("Customer Lifetime Value (CLV):", clv)
