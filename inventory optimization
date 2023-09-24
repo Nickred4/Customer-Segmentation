@@ -1,0 +1,56 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+
+# Sample data: Demand, holding cost, and ordering cost
+data = pd.DataFrame({
+    'Demand': [100, 80, 120, 90, 110, 95, 105, 75, 125, 85],  # Monthly demand
+    'Holding_Cost': 2,  # Holding cost per unit per month
+    'Ordering_Cost': 50,  # Cost of placing an order
+})
+
+# Define a function to calculate total cost
+def calculate_total_cost(order_quantity, demand, holding_cost, ordering_cost):
+    # Calculate total cost given order quantity
+    average_inventory = order_quantity / 2  # Average inventory level
+    holding_cost_total = average_inventory * holding_cost
+    ordering_cost_total = demand / order_quantity * ordering_cost
+    total_cost = holding_cost_total + ordering_cost_total
+    return total_cost
+
+# Define optimization function to minimize total cost
+def optimize_inventory(data):
+    demand = data['Demand']
+    holding_cost = data['Holding_Cost']
+    ordering_cost = data['Ordering_Cost']
+    
+    # Initial guess for order quantity
+    initial_guess = 100
+    
+    # Use scipy minimize to find optimal order quantity
+    result = minimize(calculate_total_cost, initial_guess, args=(demand, holding_cost, ordering_cost), bounds=[(0, None)])
+    
+    optimal_order_quantity = result.x[0]
+    min_total_cost = result.fun
+    
+    return optimal_order_quantity, min_total_cost
+
+# Optimize inventory
+optimal_order_quantity, min_total_cost = optimize_inventory(data)
+
+# Print results
+print(f'Optimal Order Quantity: {optimal_order_quantity}')
+print(f'Minimum Total Cost: ${min_total_cost:.2f}')
+
+# Visualize the cost vs. order quantity
+order_quantities = np.arange(1, 200, 5)
+total_costs = [calculate_total_cost(q, data['Demand'], data['Holding_Cost'], data['Ordering_Cost']) for q in order_quantities]
+
+plt.figure(figsize=(8, 6))
+plt.plot(order_quantities, total_costs)
+plt.xlabel('Order Quantity')
+plt.ylabel('Total Cost')
+plt.title('Total Cost vs. Order Quantity')
+plt.grid(True)
+plt.show()
