@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+import scipy.stats as stats
+import matplotlib.pyplot as plt
+
+# Generate synthetic data for A and B groups (conversion rates)
+np.random.seed(0)
+n_samples_A = 1000  # Number of samples in group A
+n_samples_B = 1000  # Number of samples in group B
+
+conversion_rate_A = 0.10  # Conversion rate for group A
+conversion_rate_B = 0.12  # Conversion rate for group B
+
+# Generate data for group A and group B
+data_A = np.random.binomial(1, conversion_rate_A, n_samples_A)
+data_B = np.random.binomial(1, conversion_rate_B, n_samples_B)
+
+# Calculate the conversion rates for A and B
+conversion_rate_observed_A = np.mean(data_A)
+conversion_rate_observed_B = np.mean(data_B)
+
+# Display conversion rates
+print("Conversion Rate for Group A:", conversion_rate_observed_A)
+print("Conversion Rate for Group B:", conversion_rate_observed_B)
+
+# Perform a two-sample t-test to compare means
+t_stat, p_value = stats.ttest_ind(data_A, data_B)
+
+# Display the t-statistic and p-value
+print("T-Statistic:", t_stat)
+print("P-Value:", p_value)
+
+# Define significance level (alpha)
+alpha = 0.05
+
+# Determine statistical significance
+if p_value < alpha:
+    print("Results are statistically significant - We can reject the null hypothesis.")
+else:
+    print("Results are not statistically significant - We fail to reject the null hypothesis.")
+
+# Visualize the data
+plt.figure(figsize=(8, 6))
+plt.hist(data_A, alpha=0.5, label='Group A', color='blue', bins=20)
+plt.hist(data_B, alpha=0.5, label='Group B', color='green', bins=20)
+plt.xlabel('Conversion (1 = Converted, 0 = Not Converted)')
+plt.ylabel('Frequency')
+plt.title('A/B Test Results')
+plt.legend(loc='upper right')
+plt.show()
