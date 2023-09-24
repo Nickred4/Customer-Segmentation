@@ -1,0 +1,67 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load your employee attrition dataset (replace 'employee_attrition.csv' with your dataset)
+employee_data = pd.read_csv('employee_attrition.csv')
+
+# Explore and understand the dataset
+print(employee_data.head())
+print(employee_data.info())
+
+# Visualize the distribution of attrition
+sns.countplot(x='Attrition', data=employee_data)
+plt.title('Attrition Distribution')
+plt.show()
+
+# Explore factors contributing to attrition
+# Example: Age vs. Attrition
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='Attrition', y='Age', data=employee_data)
+plt.title('Age vs. Attrition')
+plt.show()
+
+# Example: Monthly Income vs. Attrition
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='Attrition', y='MonthlyIncome', data=employee_data)
+plt.title('Monthly Income vs. Attrition')
+plt.show()
+
+# Analyze attrition by department
+plt.figure(figsize=(10, 6))
+sns.countplot(x='Department', hue='Attrition', data=employee_data)
+plt.title('Attrition by Department')
+plt.show()
+
+# Correlation heatmap to identify potential factors
+correlation_matrix = employee_data.corr()
+plt.figure(figsize=(12, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Use machine learning models (e.g., logistic regression, decision trees) for deeper analysis
+
+# Sample code for logistic regression:
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+
+# Prepare data and target
+X = employee_data.drop(columns=['Attrition'])
+y = employee_data['Attrition']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Initialize and train the logistic regression model
+logistic_model = LogisticRegression()
+logistic_model.fit(X_train, y_train)
+
+# Predict attrition on the test set
+y_pred = logistic_model.predict(X_test)
+
+# Evaluate the model
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
