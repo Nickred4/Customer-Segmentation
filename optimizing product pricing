@@ -1,0 +1,44 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+
+# Sample data: price and quantity sold
+data = pd.DataFrame({
+    'Price': [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],  # Price points
+    'Quantity_Sold': [100, 150, 200, 250, 300, 350, 400, 450, 500, 550]  # Corresponding quantity sold
+})
+
+# Define a pricing function (e.g., linear demand curve)
+def demand_curve(price, elasticity=-0.5, base_demand=500):
+    return base_demand * (1 + elasticity * price)
+
+# Define a profit function
+def calculate_profit(price, elasticity=-0.5, base_demand=500, unit_cost=4):
+    demand = demand_curve(price, elasticity, base_demand)
+    revenue = price * demand
+    cost = unit_cost * demand
+    profit = revenue - cost
+    return -profit  # Minimize negative profit to maximize actual profit
+
+# Find the optimal price using optimization
+initial_guess = 5.0  # Initial guess for the optimal price
+result = minimize(calculate_profit, initial_guess, args=(-0.5, 500, 4), bounds=[(1, 10)])
+
+optimal_price = result.x[0]
+max_profit = -result.fun  # Convert back to positive profit
+
+# Plot demand curve and optimal price
+prices = np.linspace(1, 10, 100)
+demand = demand_curve(prices)
+plt.figure(figsize=(8, 6))
+plt.plot(prices, demand, label='Demand Curve')
+plt.scatter(optimal_price, demand_curve(optimal_price), color='red', label=f'Optimal Price: ${optimal_price:.2f}')
+plt.xlabel('Price')
+plt.ylabel('Quantity Demanded')
+plt.title('Demand Curve and Optimal Price')
+plt.legend()
+plt.grid(True)
+
+print(f'Optimal Price: ${optimal_price:.2f}')
+print(f'Maximum Profit: ${max_profit:.2f}')
